@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 from fpdf import FPDF
-import os
+import io
 
 # Configure the API key securely from Streamlit's secrets
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -21,22 +21,27 @@ def generate_section_html(section_name, page_content, key):
     else:
         return ""
 
-# Function to save HTML content to a file
-def save_html(content, filename="landing_page.html"):
-    with open(filename, "w") as f:
-        f.write(content)
-    return filename
+# Function to save HTML content to an in-memory file (using BytesIO)
+def save_html_to_bytes(content):
+    # Create a BytesIO buffer and write the content
+    buffer = io.BytesIO()
+    buffer.write(content.encode("utf-8"))
+    buffer.seek(0)
+    return buffer
 
-# Function to create PDF from HTML content (simple approach)
+# Function to create PDF from HTML content (simple approach using FPDF)
 def generate_pdf_from_html(content):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, content)
-    pdf_file = "landing_page.pdf"
-    pdf.output(pdf_file)
-    return pdf_file
+    
+    # Save to an in-memory buffer
+    pdf_output = io.BytesIO()
+    pdf.output(pdf_output)
+    pdf_output.seek(0)
+    return pdf_output
 
 # Streamlit App UI
 st.title("Ever AI: Dynamic Landing Page Generator with Advanced Features")
@@ -138,24 +143,24 @@ if st.button("Generate Landing Page"):
 
         # Save the generated HTML and PDF
         if st.button("Download Landing Page as HTML"):
-            html_filename = save_html(landing_page_html)
-            with open(html_filename, "rb") as file:
-                st.download_button(
-                    label="Download HTML",
-                    data=file,
-                    file_name=html_filename,
-                    mime="text/html"
-                )
+            # Save the HTML content to a BytesIO buffer and provide download option
+            html_buffer = save_html_to_bytes(landing_page_html)
+            st.download_button(
+                label="Download HTML",
+                data=html_buffer,
+                file_name="landing_page.html",
+                mime="text/html"
+            )
         
         if st.button("Download Landing Page as PDF"):
-            pdf_filename = generate_pdf_from_html(landing_page_html)
-            with open(pdf_filename, "rb") as file:
-                st.download_button(
-                    label="Download PDF",
-                    data=file,
-                    file_name=pdf_filename,
-                    mime="application/pdf"
-                )
+            # Generate the PDF content from HTML
+            pdf_buffer = generate_pdf_from_html(landing_page_html)
+            st.download_button(
+                label="Download PDF",
+                data=pdf_buffer,
+                file_name="landing_page.pdf",
+                mime="application/pdf"
+            )
     
     except Exception as e:
         st.error(f"Error: {e}")

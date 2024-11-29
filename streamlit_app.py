@@ -31,8 +31,14 @@ def save_html_to_bytes(content):
 
 # Function to sanitize text (removing problematic characters) for PDF generation
 def sanitize_text_for_pdf(content):
-    # Replace problematic characters (like ellipsis, etc.) with simpler text
+    # Replace problematic characters with simpler ones
     content = content.replace("\u2026", "...")  # Replace ellipses with 3 dots
+    content = content.replace("\u2014", "-")  # Replace em dash (—) with hyphen
+    content = content.replace("\u2013", "-")  # Replace en dash (–) with hyphen
+    content = content.replace("\u2018", "'")  # Replace left single quote (‘) with single quote
+    content = content.replace("\u2019", "'")  # Replace right single quote (’) with single quote
+    content = content.replace("\u201C", "\"")  # Replace left double quote (“) with double quote
+    content = content.replace("\u201D", "\"")  # Replace right double quote (”) with double quote
     # Add other sanitizations as needed (you could also replace other Unicode characters here)
     return content
 

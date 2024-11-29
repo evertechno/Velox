@@ -2,6 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 import base64
+import os
+from fpdf import FPDF
 
 # Configure the API key securely from Streamlit's secrets
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -19,6 +21,23 @@ def generate_section_html(section_name, page_content, key):
         return section_html
     else:
         return ""
+
+# Function to save HTML content to a file
+def save_html(content, filename="landing_page.html"):
+    with open(filename, "w") as f:
+        f.write(content)
+    return filename
+
+# Function to create PDF from HTML content (simple approach)
+def generate_pdf_from_html(content):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, content)
+    pdf_file = "landing_page.pdf"
+    pdf.output(pdf_file)
+    return pdf_file
 
 # Streamlit App UI
 st.title("Ever AI: Dynamic Landing Page Generator with Advanced Features")
@@ -81,15 +100,37 @@ if st.button("Generate Landing Page"):
 
         # Base HTML structure
         landing_page_html = f"""
-        <div style="background-color:{background_color}; color:{text_color}; font-family: Arial, sans-serif; padding: 30px;">
-            <h1 style="color:{brand_primary_color};">{landing_page_title}</h1>
+        <html>
+        <head>
+            <title>{landing_page_title}</title>
+            <style>
+                body {{
+                    background-color:{background_color};
+                    color:{text_color};
+                    font-family: Arial, sans-serif;
+                    padding: 30px;
+                }}
+                h1 {{
+                    color:{brand_primary_color};
+                }}
+                h2 {{
+                    color:{brand_secondary_color};
+                }}
+                .section {{
+                    margin-top: 30px;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>{landing_page_title}</h1>
             <p>{landing_page_description}</p>
             {generate_section_html("About Us", page_content, "About Us")}
             {generate_section_html("Features", page_content, "Features")}
             {generate_section_html("Pricing", page_content, "Pricing")}
             {generate_section_html("Testimonials", page_content, "Testimonials")}
             {generate_section_html("Call to Action", page_content, "Call to Action")}
-        </div>
+        </body>
+        </html>
         """
 
         # Optionally add the logo to the page
@@ -97,8 +138,29 @@ if st.button("Generate Landing Page"):
             logo_img = Image.open(logo_upload)
             st.image(logo_img, width=150)
 
-        # Display the generated landing page
+        # Display the generated landing page in the browser
         st.markdown(landing_page_html, unsafe_allow_html=True)
+
+        # Provide download options for HTML and PDF
+        if st.button("Download Landing Page as HTML"):
+            html_filename = save_html(landing_page_html)
+            with open(html_filename, "rb") as file:
+                st.download_button(
+                    label="Download HTML",
+                    data=file,
+                    file_name=html_filename,
+                    mime="text/html"
+                )
+        
+        if st.button("Download Landing Page as PDF"):
+            pdf_filename = generate_pdf_from_html(landing_page_html)
+            with open(pdf_filename, "rb") as file:
+                st.download_button(
+                    label="Download PDF",
+                    data=file,
+                    file_name=pdf_filename,
+                    mime="application/pdf"
+                )
     
     except Exception as e:
         st.error(f"Error: {e}")

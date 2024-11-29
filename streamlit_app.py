@@ -137,11 +137,14 @@ if st.button("Generate Landing Page"):
         </html>
         """
 
+        # Display generated HTML code in a copyable code block
+        st.code(landing_page_html, language='html')
+
         # Optionally add the logo to the page
         if logo_upload is not None:
             logo_img = Image.open(logo_upload)
 
-        # Save the generated HTML and PDF
+        # Allow users to copy the generated code and also download it
         if st.button("Download Landing Page as HTML"):
             # Save the HTML content to a BytesIO buffer and provide download option
             html_buffer = save_html_to_bytes(landing_page_html)

@@ -1,9 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
-import base64
-import os
 from fpdf import FPDF
+import os
 
 # Configure the API key securely from Streamlit's secrets
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -68,7 +67,7 @@ pricing_prompt = st.text_input("Describe your pricing model:", "Affordable subsc
 testimonials_prompt = st.text_input("Provide some customer testimonials:", "This product has changed the way I work!")
 cta_prompt = st.text_input("Call to Action:", "Sign up for free and start using our product!")
 
-# Button to generate the landing page
+# Button to generate the landing page and provide export options
 if st.button("Generate Landing Page"):
     try:
         # Generate AI content for the sections selected
@@ -136,12 +135,8 @@ if st.button("Generate Landing Page"):
         # Optionally add the logo to the page
         if logo_upload is not None:
             logo_img = Image.open(logo_upload)
-            st.image(logo_img, width=150)
 
-        # Display the generated landing page in the browser
-        st.markdown(landing_page_html, unsafe_allow_html=True)
-
-        # Provide download options for HTML and PDF
+        # Save the generated HTML and PDF
         if st.button("Download Landing Page as HTML"):
             html_filename = save_html(landing_page_html)
             with open(html_filename, "rb") as file:

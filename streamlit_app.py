@@ -6,6 +6,20 @@ import base64
 # Configure the API key securely from Streamlit's secrets
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
+# Function to generate section HTML dynamically
+def generate_section_html(section_name, page_content, key):
+    if key in page_content:
+        content = page_content[key].text
+        section_html = f"""
+        <div style="margin-top: 30px;">
+            <h2 style="color:{brand_secondary_color};">{section_name}</h2>
+            <p>{content}</p>
+        </div>
+        """
+        return section_html
+    else:
+        return ""
+
 # Streamlit App UI
 st.title("Ever AI: Dynamic Landing Page Generator with Advanced Features")
 st.write("Create custom, AI-driven landing pages with multiple sections, interactive features, and branding options.")
@@ -88,17 +102,3 @@ if st.button("Generate Landing Page"):
     
     except Exception as e:
         st.error(f"Error: {e}")
-
-# Function to generate section HTML dynamically
-def generate_section_html(section_name, page_content, key):
-    if key in page_content:
-        content = page_content[key].text
-        section_html = f"""
-        <div style="margin-top: 30px;">
-            <h2 style="color:{brand_secondary_color};">{section_name}</h2>
-            <p>{content}</p>
-        </div>
-        """
-        return section_html
-    else:
-        return ""

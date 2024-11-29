@@ -145,25 +145,24 @@ if st.button("Generate Landing Page"):
             logo_img = Image.open(logo_upload)
 
         # Allow users to copy the generated code and also download it
-        if st.button("Download Landing Page as HTML"):
-            # Save the HTML content to a BytesIO buffer and provide download option
-            html_buffer = save_html_to_bytes(landing_page_html)
-            st.download_button(
-                label="Download HTML",
-                data=html_buffer,
-                file_name="landing_page.html",
-                mime="text/html"
-            )
+        html_buffer = save_html_to_bytes(landing_page_html)
+        pdf_buffer = generate_pdf_from_html(landing_page_html)
+
+        # HTML download button
+        st.download_button(
+            label="Download Landing Page as HTML",
+            data=html_buffer,
+            file_name="landing_page.html",
+            mime="text/html"
+        )
         
-        if st.button("Download Landing Page as PDF"):
-            # Generate the PDF content from HTML
-            pdf_buffer = generate_pdf_from_html(landing_page_html)
-            st.download_button(
-                label="Download PDF",
-                data=pdf_buffer,
-                file_name="landing_page.pdf",
-                mime="application/pdf"
-            )
+        # PDF download button
+        st.download_button(
+            label="Download Landing Page as PDF",
+            data=pdf_buffer,
+            file_name="landing_page.pdf",
+            mime="application/pdf"
+        )
     
     except Exception as e:
         st.error(f"Error: {e}")

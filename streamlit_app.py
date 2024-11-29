@@ -29,13 +29,24 @@ def save_html_to_bytes(content):
     buffer.seek(0)
     return buffer
 
+# Function to sanitize text (removing problematic characters) for PDF generation
+def sanitize_text_for_pdf(content):
+    # Replace problematic characters (like ellipsis, etc.) with simpler text
+    content = content.replace("\u2026", "...")  # Replace ellipses with 3 dots
+    # Add other sanitizations as needed (you could also replace other Unicode characters here)
+    return content
+
 # Function to create PDF from HTML content (simple approach using FPDF)
 def generate_pdf_from_html(content):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, content)
+
+    # Sanitize content before adding to the PDF
+    sanitized_content = sanitize_text_for_pdf(content)
+
+    pdf.multi_cell(0, 10, sanitized_content)
     
     # Save to an in-memory buffer
     pdf_output = io.BytesIO()

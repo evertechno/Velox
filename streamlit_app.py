@@ -173,10 +173,10 @@ if st.button("Generate Landing Page"):
             mime="text/html"
         )
         
-        # PDF download button
+        # PDF download button (using the correct buffer handling)
         st.download_button(
             label="Download Landing Page as PDF",
-            data=pdf_buffer,
+            data=pdf_buffer.getvalue(),  # We need to extract the raw bytes from the BytesIO buffer
             file_name="landing_page.pdf",
             mime="application/pdf"
         )
